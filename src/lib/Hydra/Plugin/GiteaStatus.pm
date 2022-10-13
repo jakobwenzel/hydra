@@ -41,9 +41,9 @@ sub url_from_jobsetevalinputs {
     my $repoName = $eval->jobsetevalinputs->find({ name => "gitea_repo_name" })->value;
 
     my $rev = $i->revision;
-    my $domain = URI->new($i->uri)->host;
     my $host;
     unless (defined $gitea_url) {
+        my $domain = URI->new($i->uri)->host;
         $host = "https://$domain";
     } else {
         $host = $gitea_url->value;
