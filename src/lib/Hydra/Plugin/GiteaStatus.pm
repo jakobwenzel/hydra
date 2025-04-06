@@ -31,10 +31,13 @@ sub toGiteaState {
 
 sub url_from_jobsetevalinputs {
     my ($eval) = @_;
+    print STDERR "url from jobsetevalinputs\n";
     my $giteastatusInput = $eval->jobsetevalinputs->find({ name => "gitea_status_repo" });
     return undef unless defined $giteastatusInput && defined $giteastatusInput->value;
+    print STDERR "giteastatusinput: $giteastatusInput->value\n";
     my $i = $eval->jobsetevalinputs->find({ name => $giteastatusInput->value, altnr => 0 });
     return undef unless defined $i;
+    print STDERR "found i\n";
     my $gitea_url = $eval->jobsetevalinputs->find({ name => "gitea_http_url" });
 
     my $repoOwner = $eval->jobsetevalinputs->find({ name => "gitea_repo_owner" })->value;
@@ -48,11 +51,15 @@ sub url_from_jobsetevalinputs {
     } else {
         $host = $gitea_url->value;
     }
+    
+    
+    print STDERR "returning $host/api/v1/repos/$repoOwner/$repoName/statuses/$rev and $repoOwner \n";
 
     return ("$host/api/v1/repos/$repoOwner/$repoName/statuses/$rev", $repoOwner);
 }
 sub is_gitea {
     my ($ua, $hostname) = @_;
+    print STDERR "checking if there is a gitea at https://$hostname/api/swagger \n";
     my $req = HTTP::Request->new('GET', "https://$hostname/api/swagger");
     my $res = $ua->request($req);
     return 0 unless $res->is_success;
@@ -61,7 +68,9 @@ sub is_gitea {
 
 sub try_gitea_from_repo_url {
     my ($ua, $url) = @_;
+    print STDERR "try_gitea_from_repo_url $url \n";
     if ($url =~ m!git\+https://([^/]+)/([^/]+)/([^/]+)\?.*rev=([[:xdigit:]]{40})$!) {
+    	print STDERR "pattern matches \n";
         return ("https://$1/api/v1/repos/$2/$3/statuses/$4", $2) if is_gitea($ua, $1);
     }
     return undef;
@@ -101,6 +110,7 @@ sub common {
         while (my $eval = $evals->next) {
             my ($url, $repoOwner) = url_from_jobsetevalinputs($eval);
             if (! defined $url) {
+                print STDERR "try_gitea \n";
                 ($url, $repoOwner) = try_gitea($ua, $eval);
             }
             next unless defined $url;
