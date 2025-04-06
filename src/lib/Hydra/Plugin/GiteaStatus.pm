@@ -119,6 +119,7 @@ sub common {
             print STDERR "GiteaStatus POSTing $state to $url\n";
             my $req = HTTP::Request->new('POST', $url);
             $req->header('Content-Type' => 'application/json');
+            $req->header('Accept' => 'application/json');
             $req->header('Authorization' => "token $accessToken");
             $req->content($body);
             my $res = $ua->request($req);
