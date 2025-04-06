@@ -69,7 +69,7 @@ sub is_gitea {
 sub try_gitea_from_repo_url {
     my ($ua, $url) = @_;
     print STDERR "try_gitea_from_repo_url $url \n";
-    if ($url =~ m!git\+https://([^/]+)/([^/]+)/([^/]+)\?.*rev=([[:xdigit:]]{40})$!) {
+    if ($url =~ m!git\+(?:https|ssh)://(?:[^/@]+@)?([^/]+)/([^/]+)/([^/]+)\?.*rev=([[:xdigit:]]{40})$!) {
     	print STDERR "pattern matches \n";
         return ("https://$1/api/v1/repos/$2/$3/statuses/$4", $2) if is_gitea($ua, $1);
     }
