@@ -123,7 +123,7 @@ sub common {
             $req->header('Authorization' => "token $accessToken");
             $req->content($body);
             my $res = $ua->request($req);
-            print STDERR $res->status_line, ": ", $res->decoded_content, "\n" unless $res->is_success;
+            print STDERR $res->status_line, ": ", $res->decoded_content, "\n", $res->as_string, "\n" unless $res->is_success;
         }
     }
 }
